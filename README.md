@@ -18,3 +18,13 @@ lightweight_cnn_mlp/
 ```
 
 
+# Lightweight CNN + MLP for MNIST
+
+This project contains a minimal convolutional neural network (CNN) and multi-layer perceptron (MLP) implementation for MNIST digit classification.
+
+## Demo - Google Colab
+
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yiruyang2025/lightweight_cnn_mlp/blob/main/notebooks/main.ipynb)
+
+<br><br>
