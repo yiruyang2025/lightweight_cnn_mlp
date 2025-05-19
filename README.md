@@ -34,11 +34,8 @@ The dataset contains both:
 
 All models are implemented using **TensorFlow** (As in the original paper) and trained/evaluated with accuracy and F1-score metrics.
 
----
 
-## 📁 Dataset Structure
-
-
+<br><br>
 
 ## Demo - Google Colab<br>
 
