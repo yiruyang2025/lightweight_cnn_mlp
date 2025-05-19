@@ -1,20 +1,24 @@
-from tensorflow.keras.applications import EfficientNetB0
+import tensorflow as tf
 from tensorflow.keras import layers, models
 
-def build_multimodal(input_shape_img=(224, 224, 3), input_shape_feat=(16,), num_classes=40):
-    # CNN branch
-    cnn_base = EfficientNetB0(include_top=False, weights='imagenet', pooling='avg', input_shape=input_shape_img)
-    cnn_base.trainable = False
-    img_input = layers.Input(shape=input_shape_img)
-    cnn_features = cnn_base(img_input)
+def create_multimodal_model(image_input_shape=(128, 128, 1), vector_input_dim=100, num_classes=10):
+    # Image branch
+    image_input = layers.Input(shape=image_input_shape)
+    x1 = layers.Conv2D(32, (3, 3), activation='relu')(image_input)
+    x1 = layers.MaxPooling2D((2, 2))(x1)
+    x1 = layers.Conv2D(64, (3, 3), activation='relu')(x1)
+    x1 = layers.MaxPooling2D((2, 2))(x1)
+    x1 = layers.Flatten()(x1)
 
-    # MLP branch
-    feat_input = layers.Input(shape=input_shape_feat)
-    mlp_features = layers.Dense(32, activation='relu')(feat_input)
+    # Vector branch
+    vector_input = layers.Input(shape=(vector_input_dim,))
+    x2 = layers.Dense(128, activation='relu')(vector_input)
+    x2 = layers.Dense(64, activation='relu')(x2)
 
-    # Combine
-    combined = layers.Concatenate()([cnn_features, mlp_features])
+    # Concatenate
+    combined = layers.concatenate([x1, x2])
     x = layers.Dense(64, activation='relu')(combined)
     output = layers.Dense(num_classes, activation='softmax')(x)
 
-    return models.Model(inputs=[img_input, feat_input], outputs=output)
+    model = models.Model(inputs=[image_input, vector_input], outputs=output)
+    return model
