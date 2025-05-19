@@ -4,17 +4,19 @@
 
 ```bash
 lightweight_cnn_mlp/
-├── data/                  # Dataset directory
-├── models/                # Model definition directory
-│   ├── cnn.py             # CNN model implementation
-│   └── mlp.py             # MLP model implementation
-├── notebooks/
-│   └── main.ipynb         # Main Jupyter Notebook for demonstration
-├── train.py               # Script for training the model
-├── evaluate.py            # Script for evaluating model performance
-├── requirements.txt       # List of required dependencies
-├── README.md              # Project documentation and usage guide
-└── .gitignore             # Specifies files to ignore in Git version control
+├── data/
+│   ├── sample_images/           ← Small image subset for testing
+│   └── sample_spectra.csv       ← Spectra features + labels
+├── models/
+│   ├── cnn.py
+│   ├── mlp.py
+│   └── multimodal.py            ← CNN + MLP fusion model
+├── train.py                     ← Full training loop
+├── evaluate.py                  ← Evaluation script with F1
+├── requirements.txt             ← Dependencies
+├── README.md
+└── notebooks/
+    └── demo-lightweight_cnn_mlp.ipynb ← Main demo notebook for Colab
 ```
 
 
