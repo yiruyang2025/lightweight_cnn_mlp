@@ -1,5 +1,8 @@
 # lightweight_cnn_mlp
 
+<br>
+
+```bash
 lightweight_cnn_mlp/
 ├── data/                  # Dataset directory
 ├── models/                # Model definition directory
@@ -12,3 +15,6 @@ lightweight_cnn_mlp/
 ├── requirements.txt       # List of required dependencies
 ├── README.md              # Project documentation and usage guide
 └── .gitignore             # Specifies files to ignore in Git version control
+```
+
+
