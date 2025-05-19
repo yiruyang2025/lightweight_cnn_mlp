@@ -20,9 +20,25 @@ lightweight_cnn_mlp/
 ```
 
 
-# Lightweight CNN + MLP for MNIST
+# Lightweight CNN + MLP for Leaf Classification
 
-This project contains a minimal convolutional neural network (CNN) and multi-layer perceptron (MLP) implementation for MNIST digit classification.
+This project implements lightweight convolutional neural network (CNN), multi-layer perceptron (MLP), and multimodal fusion models for leaf species classification using the public **Leaf Dataset** (Silva et al., 2014). 
+
+<br><br>
+
+The dataset contains both:
+- **Holographic grayscale images** (from BW directory) for structural patterns,
+- **Fluorescence-based numerical features** (from `leaf.csv`) for biochemical descriptors.
+
+<br>
+
+All models are implemented using **TensorFlow** (As in the original paper) and trained/evaluated with accuracy and F1-score metrics.
+
+---
+
+## 📁 Dataset Structure
+
+
 
 ## Demo - Google Colab<br>
 
