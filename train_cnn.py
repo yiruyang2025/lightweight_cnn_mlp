@@ -1,26 +1,29 @@
-from models.cnn_tf import build_cnn
+import tensorflow as tf
+from models.cnn_tf import create_cnn_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import os
 
-BATCH_SIZE = 16
-IMG_SIZE = (224, 224)
+# Define paths
+train_dir = 'data/holography/train'
+val_dir = 'data/holography/val'
 
-datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
-train_gen = datagen.flow_from_directory(
-    'data/sample_images',
-    target_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    class_mode='categorical',
-    subset='training')
+# Data generators
+train_datagen = ImageDataGenerator(rescale=1./255)
+val_datagen = ImageDataGenerator(rescale=1./255)
 
-val_gen = datagen.flow_from_directory(
-    'data/sample_images',
-    target_size=IMG_SIZE,
-    batch_size=BATCH_SIZE,
-    class_mode='categorical',
-    subset='validation')
+train_generator = train_datagen.flow_from_directory(
+    train_dir, target_size=(128, 128), color_mode='grayscale', batch_size=32, class_mode='categorical')
 
-model = build_cnn(input_shape=(224, 224, 3), num_classes=train_gen.num_classes)
+val_generator = val_datagen.flow_from_directory(
+    val_dir, target_size=(128, 128), color_mode='grayscale', batch_size=32, class_mode='categorical')
+
+# Create model
+model = create_cnn_model(input_shape=(128, 128, 1), num_classes=train_generator.num_classes)
+
+# Compile model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-model.fit(train_gen, validation_data=val_gen, epochs=20)
-model.save('model_cnn_leaf.h5')
+
+# Train model
+model.fit(train_generator, epochs=10, validation_data=val_generator)
+
+# Save model
+model.save('models/cnn_model.h5')
