@@ -3,42 +3,22 @@ from models.cnn_tf import create_cnn_model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 
-# Define paths - point to your mounted Drive BW dataset folder
-train_dir = '/content/drive/MyDrive/Leaf_data/BW'
+# Absolute paths
+base_dir = '/content/lightweight_cnn_mlp/data/holography'
+train_dir = os.path.join(base_dir, 'train')
+val_dir = os.path.join(base_dir, 'val')
 
-# Optional: check if data exists
-if not os.path.exists(train_dir):
-    raise FileNotFoundError(f"Training directory not found at: {train_dir}")
+# Data generators
+train_datagen = ImageDataGenerator(rescale=1./255)
+val_datagen = ImageDataGenerator(rescale=1./255)
 
-# Create image data generator
-datagen = ImageDataGenerator(
-    rescale=1.0 / 255,
-    validation_split=0.4  # 60% train / 40% val split, as per paper
-)
+train_generator = train_datagen.flow_from_directory(
+    train_dir, target_size=(128, 128), color_mode='grayscale', batch_size=32, class_mode='categorical')
 
-# Training generator
-train_generator = datagen.flow_from_directory(
-    train_dir,
-    target_size=(128, 128),
-    color_mode='grayscale',  # TIFF BW images
-    batch_size=32,
-    class_mode='categorical',
-    subset='training',
-    shuffle=True
-)
+val_generator = val_datagen.flow_from_directory(
+    val_dir, target_size=(128, 128), color_mode='grayscale', batch_size=32, class_mode='categorical')
 
-# Validation generator
-val_generator = datagen.flow_from_directory(
-    train_dir,
-    target_size=(128, 128),
-    color_mode='grayscale',
-    batch_size=32,
-    class_mode='categorical',
-    subset='validation',
-    shuffle=False
-)
-
-# Create CNN model
+# Create model
 model = create_cnn_model(input_shape=(128, 128, 1), num_classes=train_generator.num_classes)
 
 # Compile model
@@ -47,5 +27,5 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 # Train model
 model.fit(train_generator, epochs=10, validation_data=val_generator)
 
-# Save trained model
+# Save model
 model.save('/content/lightweight_cnn_mlp/models/cnn_model.h5')
