@@ -1,34 +1,58 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-from models.cnn import CNN
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+from PIL import Image
+import pandas as pd
+import os
+from models.multimodal import MultiModalModel
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class MultiModalDataset(Dataset):
+    def __init__(self, csv_file, image_dir, transform=None):
+        self.data = pd.read_csv(csv_file)
+        self.image_dir = image_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        row = self.data.iloc[idx]
+        img_path = os.path.join(self.image_dir, row['filename'])
+        image = Image.open(img_path).convert('L')
+        if self.transform:
+            image = self.transform(image)
+        spectrum = torch.tensor(row[1:-1].values, dtype=torch.float32)
+        label = torch.tensor(row[-1], dtype=torch.long)
+        return image, spectrum, label
 
 # Load dataset
-transform = transforms.ToTensor()
-train_data = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-train_loader = DataLoader(train_data, batch_size=64, shuffle=True)
+transform = transforms.Compose([
+    transforms.Resize((28, 28)),
+    transforms.ToTensor()
+])
 
-# Define model
-model = CNN().to(device)
+dataset = MultiModalDataset('data/sample_spectra.csv', 'data/sample_images', transform)
+loader = DataLoader(dataset, batch_size=16, shuffle=True)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = MultiModalModel().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Train loop
+# Training loop
 for epoch in range(5):
-    running_loss = 0.0
-    for images, labels in train_loader:
-        images, labels = images.to(device), labels.to(device)
+    total_loss = 0
+    for img, spec, lbl in loader:
+        img, spec, lbl = img.to(device), spec.to(device), lbl.to(device)
         optimizer.zero_grad()
-        outputs = model(images)
-        loss = criterion(outputs, labels)
+        outputs = model(img, spec)
+        loss = criterion(outputs, lbl)
         loss.backward()
         optimizer.step()
-        running_loss += loss.item()
-    print(f"Epoch {epoch+1} - Loss: {running_loss/len(train_loader):.4f}")
+        total_loss += loss.item()
+    print(f"Epoch {epoch+1}: Loss = {total_loss:.4f}")
 
 # Save model
-torch.save(model.state_dict(), "cnn_model.pth")
+torch.save(model.state_dict(), "model.pth")
