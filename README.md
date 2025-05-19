@@ -5,18 +5,19 @@
 ```bash
 lightweight_cnn_mlp/
 ├── data/
-│   ├── sample_images/           ← Small image subset for testing
-│   └── sample_spectra.csv       ← Spectra features + labels
+│   ├── sample_images/
+│   ├── sample_spectra.csv
+│   ├── train_split.csv
+│   └── test_split.csv
 ├── models/
-│   ├── cnn.py
-│   ├── mlp.py
-│   └── multimodal.py            ← CNN + MLP fusion model
-├── train.py                     ← Full training loop
-├── evaluate.py                  ← Evaluation script with F1
-├── requirements.txt             ← Dependencies
-├── README.md
+│   ├── cnn_tf.py
+│   ├── mlp_tf.py
+│   └── multimodal_tf.py
+├── train_tf.py
+├── evaluate_tf.py
+├── requirements.txt
 └── notebooks/
-    └── demo-lightweight_cnn_mlp.ipynb ← Main demo notebook for Colab
+    └── demo-lightweight_cnn_mlp.ipynb  <- on Google Colab
 ```
 
 
