@@ -1,25 +1,34 @@
 import pandas as pd
-import numpy as np
+import tensorflow as tf
+from models.mlp_tf import create_mlp_model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from tensorflow.keras.utils import to_categorical
-from models.mlp_tf import build_mlp
 
 # Load data
-csv = pd.read_csv('data/sample_spectra.csv', header=None)
-X = csv.iloc[:, 2:18].values
-y_raw = csv.iloc[:, 0].values
+data = pd.read_csv('data/fluorescence/data.csv')
 
+# Preprocess data
+X = data.drop('label', axis=1).values
+y = LabelEncoder().fit_transform(data['label'])
+y = to_categorical(y)
+
+# Split data
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale data
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_train = scaler.fit_transform(X_train)
+X_val = scaler.transform(X_val)
 
-le = LabelEncoder()
-y_idx = le.fit_transform(y_raw)
-y_encoded = to_categorical(y_idx)
+# Create model
+model = create_mlp_model(input_dim=X_train.shape[1], num_classes=y.shape[1])
 
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_encoded, test_size=0.4, stratify=y_idx, random_state=42)
-
-model = build_mlp((X_train.shape[1],), y_encoded.shape[1])
+# Compile model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=30, batch_size=16, validation_split=0.2)
-model.save('model_mlp_leaf.h5')
+
+# Train model
+model.fit(X_train, y_train, epochs=10, validation_data=(X_val, y_val))
+
+# Save model
+model.save('models/mlp_model.h5')
